@@ -88,8 +88,16 @@ airplane_descriptors = horzcat(airplane_struct.d); % concatenate all descriptors
 all_descriptors = horzcat(budda_descriptors,butterfly_descriptors,airplane_descriptors);
 num_clustors = 1000;
 
-[centers, assignments] = vl_kmeans(single(all_descriptors), num_clustors);
+%[centers, assignments] = vl_kmeans(single(all_descriptors), num_clustors);
 
 % kmeans++ 
 % http://en.wikipedia.org/wiki/K-means%2B%2B
 [centers, assignments] = vl_kmeans(single(all_descriptors), num_clustors, 'Initialization', 'plusplus');
+
+[budda_idx, budda_dist] = knnsearch(centers, budda_descriptors);
+[butterfly_idx, butterfly_dist] = knnsearch(centers, butterfly_descriptors);
+[airplane_idx, airplane_dist] = knnsearch(centers, airplane_descriptors);
+
+budda_hist = hist(budda_idx, num_clustors);
+butterfly_hist = hist(butterfly_idx, num_clustors);
+airplane_hist = hist(airplane_idx, num_clustors);
