@@ -12,7 +12,7 @@ if (strcmp(current_pwd(1:20),clear_pwd) == 1)
 	vl_version verbose
 % TODO else if windows 
 else
-	'Error; could not utilize VLFeat!\n'
+	sprintf('Error; could not utilize VLFeat!\n')
 end
 
 %% Buddas from Reduced Training Dataset
@@ -30,9 +30,13 @@ for fileNum = 1:num_buddas(1) % apply to all budda images
 	end
 
 	[f,d] = vl_sift(budda_imageG); % frames, descriptors
-	filename = strcat('budda_',regexprep(filename,'.jpg',''));
-	budda_struct.(filename) = d;
+	%filename = strcat('budda_',regexprep(filename,'.jpg',''));
+	budda_struct(fileNum).name = filename;
+	%budda_struct(fileNum).f = f;
+	budda_struct(fileNum).d = d;
 end
+
+budda_descriptors = horzcat(budda_struct.d); % concatenate all descriptors
 
 %% Butterfly from Reduced Training Dataset
 butterfly_dir = 'midterm_data/midterm_data_reduced/TrainingDataset/024.butterfly/';
@@ -49,12 +53,16 @@ for fileNum = 1:num_butterflies(1) % apply to all budda images
 	end
 
 	[f,d] = vl_sift(butterfly_imageG);
-	filename = strcat('butterfly_',regexprep(filename,'.jpg',''));
-	butterfly_struct.(filename) = d;
+	%filename = strcat('butterfly_',regexprep(filename,'.jpg',''));
+	butterfly_struct(fileNum).name = filename;
+	%butterfly_struct(fileNum).f = f;
+	butterfly_struct(fileNum).d = d;
 end
 
+butterfly_descriptors = horzcat(butterfly_struct.d); % concatenate all descriptors
+
 %% Airplane from Reduced Training Dataset
-airplane_dir = 'midterm_data/midterm_data_reduced/TrainingDataset/251.airplane/';
+airplane_dir = 'midterm_data/midterm_data_reduced/TrainingDataset/251.airplanes/';
 airplane_struct = struct();
 all_airplanes = dir(strcat(airplane_dir,'*.jpg')); % Get all .jpg images from directory
 num_airplanes = size(all_airplanes); % number of budda images
@@ -66,8 +74,22 @@ for fileNum = 1:num_airplanes(1) % apply to all budda images
 	if size(airplane_image, 3) > 1 % make sure image is not already gray
 		airplane_imageG = im2single(rgb2gray(airplane_image));
 	end
-	
+
 	[f,d] = vl_sift(airplane_imageG);
-	filename = strcat('airplane_',regexprep(filename,'.jpg',''));
-	airplane_struct.(filename) = d;
+	%filename = strcat('airplane_',regexprep(filename,'.jpg',''));
+	airplane_struct(fileNum).name = filename;
+	%airplane_struct(fileNum).f = f;
+	airplane_struct(fileNum).d = d;
 end
+
+airplane_descriptors = horzcat(airplane_struct.d); % concatenate all descriptors
+
+%% Putting Training Data together
+all_descriptors = horzcat(budda_descriptors,butterfly_descriptors,airplane_descriptors);
+num_clustors = 1000;
+
+[centers, assignments] = vl_kmeans(single(all_descriptors), num_clustors);
+
+% kmeans++ 
+% http://en.wikipedia.org/wiki/K-means%2B%2B
+[centers, assignments] = vl_kmeans(single(all_descriptors), num_clustors, 'Initialization', 'plusplus');
