@@ -144,7 +144,7 @@ rtest3_struct = struct();
 % Get all .jpg images from directory
 all_tdir1 = dir(strcat(rtest_dir1,'*.jpg'));
 all_tdir2 = dir(strcat(rtest_dir2,'*.jpg'));
-all_tdir3 = dir(strcat(rtest_dir2,'*.jpg'));
+all_tdir3 = dir(strcat(rtest_dir3,'*.jpg'));
 
 % number of test images
 num_tdir1 = size(all_tdir1); 
@@ -169,7 +169,7 @@ end
 
 for fileNum = 1:num_tdir2(1) % apply to all rtest2 images
 	filename = all_tdir2(fileNum).name;
-	tdir2_image = imread(strcat(rtest_dir1,filename));
+	tdir2_image = imread(strcat(rtest_dir2,filename));
 
 	if size(tdir2_image, 3) > 1 % make sure image is not already gray
 		tdir2_imageG = im2single(rgb2gray(tdir2_image));
@@ -184,7 +184,7 @@ end
 
 for fileNum = 1:num_tdir3(1) % apply to all rtest3 images
 	filename = all_tdir3(fileNum).name;
-	tdir3_image = imread(strcat(rtest_dir1,filename));
+	tdir3_image = imread(strcat(rtest_dir3,filename));
 
 	if size(tdir3_image, 3) > 1 % make sure image is not already gray
 		tdir3_imageG = im2single(rgb2gray(tdir3_image));
