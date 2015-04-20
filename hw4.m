@@ -94,10 +94,39 @@ num_clustors = 1000;
 % http://en.wikipedia.org/wiki/K-means%2B%2B
 [centers, assignments] = vl_kmeans(single(all_descriptors), num_clustors, 'Initialization', 'plusplus');
 
-[budda_idx, budda_dist] = knnsearch(centers, budda_descriptors);
-[butterfly_idx, butterfly_dist] = knnsearch(centers, butterfly_descriptors);
-[airplane_idx, airplane_dist] = knnsearch(centers, airplane_descriptors);
+[budda_idx, budda_dist] = knnsearch(centers', budda_descriptors');
+[butterfly_idx, butterfly_dist] = knnsearch(centers', butterfly_descriptors');
+[airplane_idx, airplane_dist] = knnsearch(centers', airplane_descriptors');
+
+budda_threshold = max(budda_dist) - 2*min(budda_dist);
+butterfly_threshold = max(butterfly_dist) - 2*min(butterfly_dist);
+airplane_threshold = max(airplane_dist) - 2*min(airplane_dist);
+
+useless_budda = find(budda_dist > budda_threshold);
+useless_butterfly = find(butterfly_dist > butterfly_threshold);
+useless_airplane = find(airplane_dist > airplane_threshold);
+
+for useless = useless_budda
+	budda_idx(useless) = [];
+	budda_dist(useless) = [];
+end
+
+for useless = useless_butterfly
+	butterfly_idx(useless) = [];
+	butterfly_dist(useless) = [];
+end
+
+for useless = useless_airplane
+	airplane_idx(useless) = [];
+	airplane_dist(useless) = [];
+end
 
 budda_hist = hist(budda_idx, num_clustors);
 butterfly_hist = hist(butterfly_idx, num_clustors);
 airplane_hist = hist(airplane_idx, num_clustors);
+
+% Normalize bin counts by total number of SIFT features binned for that particular class
+budda_histN = budda_hist./max(budda_hist);
+butterfly_histN = butterfly_hist./max(butterfly_hist);
+airplane_histN = airplane_hist./max(airplane_hist);
+
